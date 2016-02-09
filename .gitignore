@@ -1,4 +1,2 @@
-_build
-froeling
-release
 release.in/etc/analyseStream.conf
+autom4te.cache/

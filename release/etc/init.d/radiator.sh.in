@@ -15,8 +15,8 @@ PATH=/sbin:/bin:/usr/bin
 . /lib/init/vars.sh
 . /lib/lsb/init-functions
 
-PID_FILE=/home/radiator/opt/var/run/radiator.pid
-RADIATOR_BINARY=/home/radiator/opt/bin/radiator_daemon.sh
+PID_FILE=@localstatedir@/run/radiator.pid
+RADIATOR_BINARY=@bindir@/radiator_daemon.sh
 
 do_start () {
 	log_daemon_msg "Starting Radiator health monitor" "Radiator"

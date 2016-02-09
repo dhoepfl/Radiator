@@ -144,7 +144,19 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUBDIRS = src
+nobase_release_bin__FILES = release/bin/analyseStream.sh \
+		release/bin/radiator_daemon.sh
+
+nobase_release_init_d__FILES = release/etc/init.d/radiator.sh
+nobase_release_scripts__FILES = release/scripts/setup.sh
+CLEANFILES = $(nobase_release_bin__FILES) $(nobase_release_init_d__FILES) $(nobase_release_scripts__FILES)
 EXTRA_DIST = release.in
+do_subst = sed \
+	-e 's|[@]prefix@|$(prefix)|g' \
+	-e 's|[@]bindir@|$(bindir)|g' \
+	-e 's|[@]sysconfdir@|$(sysconfdir)|g' \
+	-e 's|[@]localstatedir@|$(localstatedir)|g'
+
 all: all-recursive
 
 .SUFFIXES:
@@ -479,6 +491,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -555,9 +568,25 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-am
 
 
-install-data-hook:
-	mkdir -p "$(localstatedir)"
-	cp -r -- "$(top_srcdir)/release.in/"* "$(prefix)"
+release/%: release/%.in
+	mkdir -p "$(shell dirname "$@")"
+	$(do_subst) >"$@" <"$<"
+
+install-data-hook-release-bin: $(nobase_release_bin__FILES)
+	mkdir -p "$(bindir)"
+	cp -- $(nobase_release_bin__FILES) "$(bindir)"
+
+install-data-hook-release-init-d: $(nobase_release_init_d__FILES)
+	mkdir -p "$(prefix)/etc/init.d"
+	cp -- $(nobase_release_init_d__FILES) "$(prefix)/etc/init.d"
+
+install-data-hook-release-scripts: $(nobase_release_scripts__FILES)
+	mkdir -p "$(prefix)/scripts"
+	cp -- $(nobase_release_scripts__FILES) "$(prefix)/scripts"
+
+install-data-hook: install-data-hook-release-bin install-data-hook-release-init-d
+	mkdir -p "$(localstatedir)/log"
+	mkdir -p "$(localstatedir)/run"
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

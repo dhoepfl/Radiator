@@ -1,0 +1,7 @@
+#!  /bin/bash
+
+"@bindir@/radiator" \
+	-o >(analyseStream.sh | mysql >"@localstatedir@/log/radiator.log" 2>&1) \
+	/home/radiator/source/radiator/log.log.dd &
+
+echo $! >"@localstatedir@/run/radiator.pid"
