@@ -1,0 +1,10 @@
+AC_INIT(src/main.cpp)
+
+PACKAGE=radiator
+VERSION=0.1.0
+
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+AC_PROG_CXX
+
+AC_OUTPUT(Makefile src/Makefile)
