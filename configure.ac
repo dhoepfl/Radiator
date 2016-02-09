@@ -1,9 +1,6 @@
-AC_INIT(src/main.cpp)
-
-PACKAGE=radiator
-VERSION=0.1.0
-
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+AC_INIT([radiator], [0.1.0])
+AC_CONFIG_SRCDIR([src/main.cpp])
+AM_INIT_AUTOMAKE
 
 AC_PROG_CXX
 
