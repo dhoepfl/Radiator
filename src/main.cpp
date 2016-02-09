@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
             if (optopt == 'T' || optopt == 'o')
                LOG_error << "Option -" << optopt << " requires an argument." << std::endl;
             else if (::isprint(optopt))
-               LOG_error << "Unknown option `-" << optopt << "'." << std::endl;
+               LOG_error << "Unknown option `-" << (char) optopt << "'." << std::endl;
             else
                LOG_error << "Unknown option character `\\x" << std::hex << (unsigned int) optopt << std::dec << "'." << std::endl;
             ::exit(1);
