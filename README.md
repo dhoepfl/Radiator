@@ -10,7 +10,7 @@ Nachdem wir in den letzten Wochen mehrmals (Pellets-Lager wird leer) mehrmals du
 
 ## Protokollanalyse
 
-Das Protokoll der S 3100 ist halbwegs gut analysiert. Die beste Quelle ist [dieser Thread bei mikrocontroller.net](http://www.mikrocontroller.net/topic/319990 "Fröling Heizungssteuerung auslesen"). Auch wertvoll ist [dieser Eintrag auf rigert.com](http://rigert.com/wiki-wiki/index.php?title=Fr%C3%B6ling). Die einzige Quelle, die „M3“ erwähnt ist [dieser archivierte forencity-Thread](http://www.labviewforum.de/attachment.php?aid=47302).
+Das Protokoll der S 3100 ist halbwegs gut analysiert. Die beste Quelle ist [dieser Thread bei mikrocontroller.net](http://www.mikrocontroller.net/topic/319990 "Fröling Heizungssteuerung auslesen"). Auch wertvoll ist [dieser Eintrag auf rigert.com](http://rigert.com/wiki-wiki/index.php?title=Fr%C3%B6ling). Die einzige Quelle, die „M3“ erwähnt ist [das hier verlinkte Archiv eines Foren-City-Threads](http://www.labviewforum.de/Thread-Mit-RS232-Daten-lesen-und-schreiben?pid=159201#pid159201).
 
 Die drei Quellen scheinen größtenteils voneinander abzuschreiben (Forencity ist dabei der älteste, gefolgt von mikrocontroller und dann rigert.com), allen gemein ist, dass meiner Ansicht nach keiner der dort Mitschreibenden das Protokoll verstanden hat. Da wird davon gesprochen, dass 32 Mal ein bestimmter Befehl gesendet werden müsste, um die Kommunikation am Laufen zu halten, oder dass man abwechselnd „M1“ und „M2“ abfragen müsste. Ich halte das für Blödsinn.
 
