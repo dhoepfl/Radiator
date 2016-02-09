@@ -3,6 +3,7 @@
 SCRIPT_HOME="$(dirname "$0")"
 [ -e "$HOME/.analysestreamrc" ] && source "$HOME/.analysestreamrc"
 [ -e "$SCRIPT_HOME/analyseStream.conf" ] && source "$SCRIPT_HOME/analyseStream.conf"
+[ -e "$SCRIPT_HOME/../etc/analyseStream.conf" ] && source "$SCRIPT_HOME/../etc/analyseStream.conf"
 
 if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" ] ; then
    echo "\$HOME/.analysestreamrc or $SCRIPT_HOME/analyseStream.conf must set" >&2
