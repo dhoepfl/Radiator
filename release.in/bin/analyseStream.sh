@@ -42,7 +42,7 @@ while read X; do
       fi
 
       if [[ "$X" =~ ^$ ]] ; then
-         echo -n "INSERT INTO Measurement values('$TIMESTAMP'"
+         echo -n "INSERT INTO Measurement VALUES('$TIMESTAMP'"
          for i in {0..29}; do
             echo -n ", ${VALUES[$i]}"
          done
