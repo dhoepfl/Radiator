@@ -29,11 +29,11 @@ ${BUILDDIR}:
 	@echo "[${PREPARE}PREPARE${NORMAL}]"
 	@[ -e "${BUILDDIR}" ] || mkdir -p ${BUILDDIR}
 
-${BUILDDIR}/%.o: ${SRCDIR}/%.cpp ${SRCDIR}/%.h $(filter-out $(wildcard ${BUILDDIR}), ${BUILDDIR}) ${BUILDDIR}
+${BUILDDIR}/%.o: ${SRCDIR}/%.cpp ${SRCDIR}/%.h | $(filter-out $(wildcard ${BUILDDIR}), ${BUILDDIR}) ${BUILDDIR}
 	@echo "[${WORK}CC${NORMAL}] $@"
 	@${CXX} -g -c -o "$@" ${CXXFLAGS} "${SRCDIR}/$*.cpp"
 
-${BUILDDIR}/%.o: ${SRCDIR}/%.cpp $(filter-out $(wildcard ${BUILDDIR}), ${BUILDDIR}) ${BUILDDIR}
+${BUILDDIR}/%.o: ${SRCDIR}/%.cpp | $(filter-out $(wildcard ${BUILDDIR}), ${BUILDDIR}) ${BUILDDIR}
 	@echo "[${WORK}CC${NORMAL}] $@"
 	@${CXX} -g -c -o "$@" ${CXXFLAGS} "${SRCDIR}/$*.cpp"
 
