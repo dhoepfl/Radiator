@@ -1,7 +1,27 @@
 #!  /bin/bash
 
+SCRIPT_HOME="$(dirname "$0")"
+[ -e "$SCRIPT_HOME/radiator.conf" ] && source "$SCRIPT_HOME/radiator.conf"
+[ -e "@sysconfdir@/radiator.conf" ] && source "@sysconfdir@/radiator.conf"
+[ -e "$HOME/.radiatorrc" ] && source "$HOME/.radiatorrc"
+
+if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" ] ; then
+   echo "\$HOME/.radiatorrc, @sysconfdir@/radiator.conf," >&2
+   echo "or $SCRIPT_HOME/radiator.conf must set" >&2
+   echo "MAIL_FROM, MAIL_TO, and SERIAL_DEVICE" >&2
+   echo "" >&2
+   echo "Example radiator.conf:" >&2
+   echo "" >&2
+   echo "   MAIL_FROM='<heizung@example.com>'" >&2
+   echo "   MAIL_TO='<janitor@example.com>'" >&2
+   echo "" >&2
+   echo "   SERIAL_DEVICE='/dev/ttyAMA0'" >&2
+   echo "" >&2
+   exit 1
+fi
+
 "@bindir@/radiator" \
-	-o >(analyseStream.sh | mysql >"@localstatedir@/log/radiator.log" 2>&1) \
-	/home/radiator/source/radiator/log.log.dd &
+	-o >("@bindir@/radiator_analyseStream.sh" | mysql >"@localstatedir@/log/radiator.log" 2>&1) \
+	"$SERIAL_DEVICE" &
 
 echo $! >"@localstatedir@/run/radiator.pid"

@@ -1,9 +1,9 @@
 SUBDIRS = src
 
-nobase_release_bin__FILES = release/bin/analyseStream.sh \
+nobase_release_bin__FILES = release/bin/radiator_analyseStream.sh \
 		release/bin/radiator_daemon.sh
 nobase_release_init_d__FILES = release/etc/init.d/radiator.sh
-nobase_release_scripts__FILES = release/scripts/setup.sh
+nobase_release_scripts__FILES = release/scripts/radiator_setup.sh
 CLEANFILES=$(nobase_release_bin__FILES) $(nobase_release_init_d__FILES) $(nobase_release_scripts__FILES)
 EXTRA_DIST = release.in
 
@@ -30,6 +30,6 @@ install-data-hook-release-scripts: $(nobase_release_scripts__FILES)
 	mkdir -p "$(prefix)/scripts"
 	cp -- $(nobase_release_scripts__FILES) "$(prefix)/scripts"
 
-install-data-hook: install-data-hook-release-bin install-data-hook-release-init-d
+install-data-hook: install-data-hook-release-bin install-data-hook-release-init-d install-data-hook-release-scripts
 	mkdir -p "$(localstatedir)/log"
 	mkdir -p "$(localstatedir)/run"

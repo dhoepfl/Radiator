@@ -1,18 +1,21 @@
 #!  /bin/bash
 
 SCRIPT_HOME="$(dirname "$0")"
-[ -e "$HOME/.analysestreamrc" ] && source "$HOME/.analysestreamrc"
-[ -e "$SCRIPT_HOME/analyseStream.conf" ] && source "$SCRIPT_HOME/analyseStream.conf"
-[ -e "@sysconfdir@/analyseStream.conf" ] && source "@sysconfdir@/analyseStream.conf"
+[ -e "$SCRIPT_HOME/radiator.conf" ] && source "$SCRIPT_HOME/radiator.conf"
+[ -e "@sysconfdir@/radiator.conf" ] && source "@sysconfdir@/radiator.conf"
+[ -e "$HOME/.radiatorrc" ] && source "$HOME/.radiatorrc"
 
-if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" ] ; then
-   echo "\$HOME/.analysestreamrc, $SCRIPT_HOME/analyseStream.conf," >&2
-   echo "or @sysconfdir@/analyseStream.conf must set MAIL_FROM and MAIL_TO" >&2
+if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" ] ; then
+   echo "\$HOME/.radiatorrc, @sysconfdir@/radiator.conf," >&2
+   echo "or $SCRIPT_HOME/radiator.conf must set" >&2
+   echo "MAIL_FROM, MAIL_TO, and SERIAL_DEVICE" >&2
    echo "" >&2
-   echo "Example analyseStream.conf:" >&2
+   echo "Example radiator.conf:" >&2
    echo "" >&2
    echo "   MAIL_FROM='<heizung@example.com>'" >&2
    echo "   MAIL_TO='<janitor@example.com>'" >&2
+   echo "" >&2
+   echo "   SERIAL_DEVICE='/dev/ttyAMA0'" >&2
    echo "" >&2
    exit 1
 fi
@@ -32,26 +35,26 @@ send_error_mail() {
    echo ""
    echo "Hallo,"
    echo ""
-   echo "Die Heizung ist hat eine Störung gemeldet!"
+   echo "Die Heizung hat eine Störung gemeldet!"
    echo ""
    echo "   $ERROR_TIME"
    echo "   $ERROR_DESCRIPTION"
    echo ""
 
-   DISPLAY1=$(echo "${RAWVALUES[0]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//')
-   DISPLAY2=$(echo "${RAWVALUES[1]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//')
+   DISPLAY1=$(echo "${RAWVALUES[0]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | iconv -f utf-8 -t latin1)
+   DISPLAY2=$(echo "${RAWVALUES[1]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | iconv -f utf-8 -t latin1)
    echo "             .-----------------,"
-   printf "             | %15s |\n" "$DISPLAY1"
-   printf "             | %15s |\n" "$DISPLAY2"
+   printf "             | %15s |\n" "$DISPLAY1" | iconv -f latin1 -t utf-8
+   printf "             | %15s |\n" "$DISPLAY2" | iconv -f latin1 -t utf-8
    echo "             \`-----------------'"
    echo ""
    echo "Aktuelle Messwerte:"
    echo ""
    for i in {2..29}; do
       V=$(echo "${RAWVALUES[$i]}" | sed -e 's/^.VALUE. .. //' -e 's/.\[[SON]\] ([0-9]*)$//')
-      LABEL=$(echo "$V" | cut -d = -f 1 | sed -e 's/^.//' -e 's/. *$//')
-      VALUE=$(echo "$V" | cut -d = -f 2 | sed -e 's/^ *.//' -e 's/. *$//')
-      printf "%25s %6s\n" "$LABEL" "$VALUE"
+      LABEL=$(echo "$V" | cut -d = -f 1 | sed -e 's/^.//' -e 's/. *$//' | iconv -f utf-8 -t latin1)
+      VALUE=$(echo "$V" | cut -d = -f 2 | sed -e 's/^ *.//' -e 's/. *$//' | iconv -f utf-8 -t latin1)
+      printf "%25s %6s\n" "$LABEL" "$VALUE" | iconv -f latin1 -t utf-8
    done
    ) | sendmail "$MAIL_TO" >/dev/null 2>&1
 }
@@ -86,7 +89,7 @@ while read X; do
       fi
 
       if [[ "$X" =~ ^$ ]] ; then
-         echo -n "INSERT INTO Measurement VALUES('$TIMESTAMP'"
+         echo -n "INSERT INTO Measurement VALUES(NULL, '$TIMESTAMP'"
          for i in {0..29}; do
             echo -n ", ${VALUES[$i]}"
          done
