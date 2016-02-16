@@ -570,6 +570,7 @@ uninstall-info: uninstall-info-recursive
 
 release/%: release/%.in
 	mkdir -p "$(shell dirname "$@")"
+	cp -a "$<" "$@"
 	$(do_subst) >"$@" <"$<"
 
 install-data-hook-release-bin: $(nobase_release_bin__FILES)

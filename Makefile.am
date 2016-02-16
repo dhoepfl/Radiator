@@ -15,6 +15,7 @@ do_subst = sed \
 
 release/%: release/%.in
 	mkdir -p "$(shell dirname "$@")"
+	cp -a "$<" "$@"
 	$(do_subst) >"$@" <"$<"
 
 install-data-hook-release-bin: $(nobase_release_bin__FILES)

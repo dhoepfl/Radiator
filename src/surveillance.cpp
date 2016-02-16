@@ -268,13 +268,13 @@ void Surveillance::parseDateTime(const uint8_t *command)
       return;
    }
 
-   uint16_t year = 2000 + (command[9] >> 4) * 10 + (command[9] & 0x0f);
-   uint8_t month = (command[7] >> 4) * 10 + (command[7] & 0x0f);
-   uint8_t day = (command[6] >> 4) * 10 + (command[6] & 0x0f);
+   uint16_t year = 2000 + this->bcd(command[9]);
+   uint8_t month = this->bcd(command[7]);
+   uint8_t day = this->bcd(command[6]);
    uint8_t dow = command[8];
-   uint8_t hour = (command[5] >> 4) * 10 + (command[5] & 0x0f);
-   uint8_t minute = (command[4] >> 4) * 10 + (command[4] & 0x0f);
-   uint8_t second = (command[3] >> 4) * 10 + (command[3] & 0x0f);
+   uint8_t hour = this->bcd(command[5]);
+   uint8_t minute = this->bcd(command[4]);
+   uint8_t second = this->bcd(command[3]);
 
    LOG_debug
       << "Date/Time: "
@@ -303,7 +303,46 @@ void Surveillance::parseDateTime(const uint8_t *command)
 
 void Surveillance::parseFailure(const uint8_t *command)
 {
-   dump_string("! ", command, 3+command[2], LOG_fatal);
+   if (command[2] != 10) {
+      LOG_error << "Failure message length invalid." << std::endl;
+      this->state = ST_ERROR;
+      return;
+   }
+
+   uint8_t errorID = command[3];
+   // uint8_t unknown1 = command[4];
+   // uint8_t unknown2 = command[5];
+   uint8_t second = this->bcd(command[6]);
+   uint8_t minute = this->bcd(command[7]);
+   uint8_t hour = this->bcd(command[8]);
+   uint8_t day = this->bcd(command[9]);
+   uint8_t month = this->bcd(command[10]);
+   uint16_t year = 2000+this->bcd(command[12]);
+   uint8_t dow = command[11];
+
+   auto errorText = this->errorMessages.find(errorID);
+   std::string description;
+   if (errorText != this->errorMessages.end()) {
+      description = errorText->second;
+   } else {
+      description = "Unknown";
+   }
+   LOG_debug
+      << "Received error: "
+      << std::dec
+      << std::setw(4) << std::setfill('0') << (int) year << "-"
+      << std::setw(2) << std::setfill('0') << (int) month << "-"
+      << std::setw(2) << std::setfill('0') << (int) day << ", "
+      << std::setw(2) << std::setfill('0') << (int) hour << ":"
+      << std::setw(2) << std::setfill('0') << (int) minute << ":"
+      << std::setw(2) << std::setfill('0') << (int) second << ": "
+      << description << std::endl;
+
+   this->handler.handleError(*this,
+                             dow,
+                             year, month, day,
+                             hour, minute, second,
+                             description);
 }
 
 void Surveillance::parseParameterNames(const uint8_t *command)

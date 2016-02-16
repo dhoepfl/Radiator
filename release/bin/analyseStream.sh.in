@@ -17,11 +17,55 @@ if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" ] ; then
    exit 1
 fi
 
-OLDSTATUS=""
+send_error_mail() {
+   local ERROR_TIME="$1"
+   local ERROR_DESCRIPTION="$2"
+   eval "declare -A RAWVALUES="${3#*=}
+
+   (
+   echo "From: $MAIL_FROM"
+   echo "To: $MAIL_TO"
+   echo "Subject: Heizung: =?iso-8859-1?Q?St=F6rung?="
+   echo "Date: $(date -R)"
+   echo "Content-Transfer-Encoding: 8bit"
+   echo "Content-Type: text/plain; charset=\"UTF-8\""
+   echo ""
+   echo "Hallo,"
+   echo ""
+   echo "Die Heizung ist hat eine Störung gemeldet!"
+   echo ""
+   echo "   $ERROR_TIME"
+   echo "   $ERROR_DESCRIPTION"
+   echo ""
+
+   DISPLAY1=$(echo "${RAWVALUES[0]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//')
+   DISPLAY2=$(echo "${RAWVALUES[1]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//')
+   echo "             .-----------------,"
+   printf "             | %15s |\n" "$DISPLAY1"
+   printf "             | %15s |\n" "$DISPLAY2"
+   echo "             \`-----------------'"
+   echo ""
+   echo "Aktuelle Messwerte:"
+   echo ""
+   for i in {2..29}; do
+      V=$(echo "${RAWVALUES[$i]}" | sed -e 's/^.VALUE. .. //' -e 's/.\[[SON]\] ([0-9]*)$//')
+      LABEL=$(echo "$V" | cut -d = -f 1 | sed -e 's/^.//' -e 's/. *$//')
+      VALUE=$(echo "$V" | cut -d = -f 2 | sed -e 's/^ *.//' -e 's/. *$//')
+      printf "%25s %6s\n" "$LABEL" "$VALUE"
+   done
+   ) | sendmail "$MAIL_TO" >/dev/null 2>&1
+}
+
 TIMESTAMP=""
 while read X; do
    if [[ "$X" =~ ^\[TIME\]\ [A-Za-z]*,\ ([-0-9]*),\ ([:0-9]*) ]] ; then
       TIMESTAMP="${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"
+   fi
+
+   if [[ "$X" =~ ^\[ERROR\]\ (...,\ ....-..-..,\ ..:..:..):\ (.*) ]] ; then
+      ERROR_TIME="${BASH_REMATCH[1]}"
+      ERROR_DESC="${BASH_REMATCH[2]}"
+      send_error_mail "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "$(declare -p OLD_RAW_VALUES)"
    fi
 
    if [ -n "$TIMESTAMP" ] ; then
@@ -48,40 +92,9 @@ while read X; do
          done
          echo ");"
 
-         if [ -n "$OLDSTATUS" ] ; then
-            if [ "$OLDSTATUS" -ne "${PRINTVALUES[2]}" ] ; then
-               (
-               echo "From: $MAIL_FROM"
-               echo "To: $MAIL_TO"
-               echo "Subject: Statuswechsel Heizung"
-               echo "Date: $(date -R)"
-               echo "Content-Transfer-Encoding: 8bit"
-               echo "Content-Type: text/plain; charset=\"UTF-8\""
-               echo ""
-               echo "Hallo,"
-               echo ""
-               echo "Der Status der Heizung hat sich gerade von $OLDSTATUS auf ${PRINTVALUES[2]} geändert." | iconv -f utf-8 -t latin1
-               echo ""
+         temp=$(declare -p RAWVALUES)
+         eval "${temp/RAWVALUES=/OLD_RAW_VALUES=}"
 
-               DISPLAY1=$(echo "${RAWVALUES[0]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | iconv -f utf-8 -t latin1)
-               DISPLAY2=$(echo "${RAWVALUES[1]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | iconv -f utf-8 -t latin1)
-               echo "             .-----------------,"
-               printf "             | %15s |\n" "$DISPLAY1"
-               printf "             | %15s |\n" "$DISPLAY2"
-               echo "             \`-----------------'"
-               echo ""
-               echo "Aktuelle Messwerte:"
-               echo ""
-               for i in {2..29}; do
-                  V=$(echo "${RAWVALUES[$i]}" | sed -e 's/^.VALUE. .. //' -e 's/.\[[SON]\] ([0-9]*)$//')
-                  LABEL=$(echo "$V" | cut -d = -f 1 | sed -e 's/^.//' -e 's/. *$//' | iconv -f utf-8 -t latin1)
-                  VALUE=$(echo "$V" | cut -d = -f 2 | sed -e 's/^ *.//' -e 's/. *$//' | iconv -f utf-8 -t latin1)
-                  printf "%25s %6s\n" "$LABEL" "$VALUE"
-               done
-               ) | iconv -f latin1 -t utf-8 | sendmail "$MAIL_TO" >/dev/null 2>&1
-            fi
-         fi
-         OLDSTATUS="${PRINTVALUES[2]}"
          unset VALUES
          unset PRINTVALUES
          unset RAWVALUES

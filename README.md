@@ -160,15 +160,25 @@ Alle Werte sind BCD, d.h. die oberen 4 Bit beschreiben die Zehner-Stelle, die un
 
 ### Fehlermeldung („M3“)
 
-Ist für mich mit die interessanteste Meldung, habe ich aber bisher noch nicht beobachten können.
+Wird gesendet, wenn ein Fehler auftritt. Vermutlich die interessanteste Meldung überhaupt, jedenfalls für meinen Anwendungszweck!
 
 | Bytes  | Wert           | Beschreibung                                                        |
 | ------ | -------------- | ------------------------------------------------------------------- |
 | 2      | 0x4D 0x33      | Befehl                                                              |
-| 1      | 0x..           | Länge                                                               |
-| n      | ...            | Daten                                                               |
+| 1      | 0x0a           | Länge                                                               |
+| 1      | 0x..           | Fehlertext-ID                                                       |
+| 1      | 0x..           | Unbekannt                                                           |
+| 1      | 0x..           | Unbekannt                                                           |
+| 1      | 0x..           | Sekunden                                                            |
+| 1      | 0x..           | Minuten                                                             |
+| 1      | 0x..           | Stunden                                                             |
+| 1      | 0x..           | Tag                                                                 |
+| 1      | 0x..           | Monat                                                               |
+| 1      | 0x..           | Wochentag (1: Montag, ..., 7: Sonntag)                              |
+| 1      | 0x..           | Jahr                                                                |
 | 2      | 0x.. 0x..      | Prüfsumme                                                           |
 
+Der Inhalt entspricht dem von „MU“, die Fehlertext-ID ist analog denen in „MT“.
 
 ### Bezeichnung der Parameter in „M1“ („MA“)
 

@@ -6,7 +6,9 @@
 #include <iostream>
 #include <iomanip>
 
-radiator::OutputHandler::OutputHandler(std::string filename)
+namespace radiator {
+
+OutputHandler::OutputHandler(std::string filename)
 {
    if (filename == "-") {
       ostream = &std::cout;
@@ -17,17 +19,17 @@ radiator::OutputHandler::OutputHandler(std::string filename)
    }
 }
 
-radiator::OutputHandler::~OutputHandler()
+OutputHandler::~OutputHandler()
 {
    if (ostream != &std::cout) {
       delete ostream;
    }
 }
 
-void radiator::OutputHandler::handleTime(radiator::Surveillance &surveillance,
-                                         uint8_t dow,
-                                         uint16_t year, uint8_t month, uint8_t day,
-                                         uint8_t hour, uint8_t minute, uint8_t second)
+void OutputHandler::handleTime(Surveillance &surveillance,
+                               uint8_t dow,
+                               uint16_t year, uint8_t month, uint8_t day,
+                               uint8_t hour, uint8_t minute, uint8_t second)
 {
    if (!ostream) {
       return;
@@ -46,8 +48,8 @@ void radiator::OutputHandler::handleTime(radiator::Surveillance &surveillance,
       << std::setw(2) << std::setfill('0') << (int) second << std::endl;
 }
 
-void radiator::OutputHandler::handleMeasurement(Surveillance &surveillance,
-                                                std::list<VALUE_DATA> values)
+void OutputHandler::handleMeasurement(Surveillance &surveillance,
+                                      std::list<VALUE_DATA> values)
 {
    if (!ostream) {
       return;
@@ -79,4 +81,30 @@ void radiator::OutputHandler::handleMeasurement(Surveillance &surveillance,
          << " (" << (int) iter->rawValue << ")" << std::endl;
    }
    *ostream << std::endl;
+}
+
+void OutputHandler::handleError(Surveillance &surveillance,
+                                uint8_t dow,
+                                uint16_t year, uint8_t month, uint8_t day,
+                                uint8_t hour, uint8_t minute, uint8_t second,
+                                std::string description)
+{
+   if (!ostream) {
+      return;
+   }
+
+   static const char *dowString[7] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+
+   *ostream << "[ERROR] "
+      << dowString[dow-1] << ", "
+      << std::dec
+      << std::setw(4) << std::setfill('0') << (int) year << "-"
+      << std::setw(2) << std::setfill('0') << (int) month << "-"
+      << std::setw(2) << std::setfill('0') << (int) day << ", "
+      << std::setw(2) << std::setfill('0') << (int) hour << ":"
+      << std::setw(2) << std::setfill('0') << (int) minute << ":"
+      << std::setw(2) << std::setfill('0') << (int) second << ": "
+      << description << std::endl;
+}
+
 }
