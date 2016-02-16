@@ -41,6 +41,8 @@ EOF
 
 mysql -u RADIATOR -p"$RADIATOR_PASSWORD" RADIATOR <<'EOF'
 CREATE TABLE Measurement (
+   `ID`                       INTEGER           AUTO_INCREMENT,
+
    `Timestamp`                DATETIME          NOT NULL,
 
    `Display 1`                VARCHAR(20)       NOT NULL,
@@ -76,7 +78,7 @@ CREATE TABLE Measurement (
    `Boardtemperatur`          DECIMAL(4, 1)     NOT NULL,
    `Kesseltemperatur SW`      DECIMAL(4, 1)     NOT NULL,
 
-   PRIMARY KEY(Timestamp)
+   PRIMARY KEY(ID)
 ) DEFAULT CHARSET=utf8;
 
 EOF
