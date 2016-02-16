@@ -20,19 +20,44 @@ if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" ] ; then
    exit 1
 fi
 
+mail_write_header() {
+   echo "From: $MAIL_FROM"
+   echo "To: $MAIL_TO"
+   echo "Subject: =?iso-8859-1?Q?$(echo "$1" | recode u8/..l1/QP)?="
+   echo "Date: $(date -R)"
+   echo "Content-Transfer-Encoding: 8bit"
+   echo "Content-Type: text/plain; charset=\"UTF-8\""
+   echo ""
+}
+
+mail_dump_values() {
+   eval "declare -A RAWVALUES="${1#*=}
+
+   DISPLAY1=$(echo "${RAWVALUES[0]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | recode u8/..l1/)
+   DISPLAY2=$(echo "${RAWVALUES[1]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | recode u8/..l1/)
+   echo "             .-----------------,"
+   printf "             | %15s |\n" "$DISPLAY1" | recode l1/..u8/
+   printf "             | %15s |\n" "$DISPLAY2" | recode l1/..u8/
+   echo "             \`-----------------'"
+   echo ""
+   echo "Aktuelle Messwerte:"
+   echo ""
+   for i in {2..29}; do
+      V=$(echo "${RAWVALUES[$i]}" | sed -e 's/^.VALUE. .. //' -e 's/.\[[SON]\] ([0-9]*)$//')
+      LABEL=$(echo "$V" | cut -d = -f 1 | sed -e 's/^.//' -e 's/. *$//' | recode u8/..l1/)
+      VALUE=$(echo "$V" | cut -d = -f 2 | sed -e 's/^ *.//' -e 's/. *$//' | recode u8/..l1/)
+      printf "%25s %6s\n" "$LABEL" "$VALUE" | recode l1/..u8/
+   done
+}
+
 send_error_mail() {
    local ERROR_TIME="$1"
    local ERROR_DESCRIPTION="$2"
    eval "declare -A RAWVALUES="${3#*=}
 
    (
-   echo "From: $MAIL_FROM"
-   echo "To: $MAIL_TO"
-   echo "Subject: Heizung: =?iso-8859-1?Q?St=F6rung?="
-   echo "Date: $(date -R)"
-   echo "Content-Transfer-Encoding: 8bit"
-   echo "Content-Type: text/plain; charset=\"UTF-8\""
-   echo ""
+   mail_write_header "Heizung: =?iso-8859-1?Q?St=F6rung?="
+
    echo "Hallo,"
    echo ""
    echo "Die Heizung hat eine Störung gemeldet!"
@@ -41,24 +66,27 @@ send_error_mail() {
    echo "   $ERROR_DESCRIPTION"
    echo ""
 
-   DISPLAY1=$(echo "${RAWVALUES[0]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | iconv -f utf-8 -t latin1)
-   DISPLAY2=$(echo "${RAWVALUES[1]}" | sed -e 's/.*= .//' -e 's/\] \[[SON]\] *([0-9]*) *$//' | iconv -f utf-8 -t latin1)
-   echo "             .-----------------,"
-   printf "             | %15s |\n" "$DISPLAY1" | iconv -f latin1 -t utf-8
-   printf "             | %15s |\n" "$DISPLAY2" | iconv -f latin1 -t utf-8
-   echo "             \`-----------------'"
-   echo ""
-   echo "Aktuelle Messwerte:"
-   echo ""
-   for i in {2..29}; do
-      V=$(echo "${RAWVALUES[$i]}" | sed -e 's/^.VALUE. .. //' -e 's/.\[[SON]\] ([0-9]*)$//')
-      LABEL=$(echo "$V" | cut -d = -f 1 | sed -e 's/^.//' -e 's/. *$//' | iconv -f utf-8 -t latin1)
-      VALUE=$(echo "$V" | cut -d = -f 2 | sed -e 's/^ *.//' -e 's/. *$//' | iconv -f utf-8 -t latin1)
-      printf "%25s %6s\n" "$LABEL" "$VALUE" | iconv -f latin1 -t utf-8
-   done
+   mail_dump_values "$(declare -p RAWVALUES)"
+
    ) | sendmail "$MAIL_TO" >/dev/null 2>&1
 }
 
+send_off_mail() {
+   eval "declare -A RAWVALUES="${1#*=}
+
+   (
+   mail_write_header "Heizung: Ausgeschaltet"
+
+   echo "Hallo,"
+   echo ""
+   echo "Die Heizung ist seit mehr als 1 Stunde ausgeschaltet!"
+   echo ""
+
+   mail_dump_values "$(declare -p RAWVALUES)"
+   ) | sendmail "$MAIL_TO" >/dev/null 2>&1
+}
+
+TURNED_OFF=""
 TIMESTAMP=""
 while read X; do
    if [[ "$X" =~ ^\[TIME\]\ [A-Za-z]*,\ ([-0-9]*),\ ([:0-9]*) ]] ; then
@@ -94,6 +122,29 @@ while read X; do
             echo -n ", ${VALUES[$i]}"
          done
          echo ");"
+
+         # Check for radiator being turned off.
+         if [ $(echo "${RAWVALUES[0]}" | sed -e 's/.*(\([0-9]*\))/\1/') -eq 6 ] ; then
+            # Radiator is off.
+
+            if [ -z "$TURNED_OFF" ] ; then
+               # Just got turned off
+               TURNED_OFF=$(date +%s)
+               OFF_MAIL_SENT=no
+            else
+               # Off for 2 or more seconds
+               OFF_DURATION=$(echo $(date +%s) - $TURNED_OFF | bc)
+               if [ "$OFF_DURATION" -gt 3600 ] ; then
+                  if [ "$OFF_MAIL_SENT" = "no" ] ; then
+                     OFF_MAIL_SENT=yes
+                     send_off_mail "$(declare -p OLD_RAW_VALUES)"
+                  fi
+               fi
+            fi
+         else
+            # Radiator is on
+            TURNED_OFF=""
+         fi
 
          temp=$(declare -p RAWVALUES)
          eval "${temp/RAWVALUES=/OLD_RAW_VALUES=}"
