@@ -24,11 +24,7 @@ while read X; do
       fi
 
       if [[ "$X" =~ ^$ ]] ; then
-         echo -n "INSERT INTO Measurement VALUES(NULL, '$TIMESTAMP'"
-         for i in {0..29}; do
-            echo -n ", ${VALUES[$i]}"
-         done
-         echo ");"
+         echo "INSERT INTO Measurement VALUES(NULL, '$TIMESTAMP', $(IFS=, ; echo "${VALUES[*]}"));"
 
          unset VALUES
          unset PRINTVALUES

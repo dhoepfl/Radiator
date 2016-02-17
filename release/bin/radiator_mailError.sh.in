@@ -107,7 +107,6 @@ while read X; do
          VALUE="${BASH_REMATCH[3]}"
          TYPE="${BASH_REMATCH[4]}"
 
-         PRINTVALUES[$KEY]="$VALUE"
          RAWVALUES[$KEY]="$X"
 
          if [ "$TYPE" = "N" ] ; then
@@ -119,7 +118,7 @@ while read X; do
 
       if [[ "$X" =~ ^$ ]] ; then
          # Check for radiator being turned off.
-         if [ $(echo "${RAWVALUES[0]}" | sed -e 's/.*(\([0-9]*\))/\1/') -eq 6 ] ; then
+         if [[ "${RAWVALUES[0]}" =~ ^.*\((6)\) ]] ; then
             # Radiator is off.
 
             if [ -z "$TURNED_OFF" ] ; then
@@ -145,7 +144,6 @@ while read X; do
          eval "${temp/RAWVALUES=/OLD_RAW_VALUES=}"
 
          unset VALUES
-         unset PRINTVALUES
          unset RAWVALUES
       fi
    fi

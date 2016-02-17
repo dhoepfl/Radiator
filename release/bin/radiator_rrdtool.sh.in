@@ -42,12 +42,7 @@ while read X; do
       fi
 
       if [[ "$X" =~ ^$ ]] ; then
-         RRD_UPDATE=$(                 \
-         echo -n "$UNIX_TIME";         \
-         for i in {0..29}; do          \
-            echo -n ":${VALUES[$i]}";  \
-         done ) 
-         rrdtool update "$RRD" "$RRD_UPDATE"
+         rrdtool update "$RRD" "$UNIX_TIME:$(IFS=: ; echo "${VALUES[*]}")"
 
          unset VALUES
          TIMESTAMP=""
