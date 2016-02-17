@@ -27,6 +27,7 @@ fi
               >"@localstatedir@/log/radiator_mailError.log" 2>&1) | \
      "@bindir@/radiator_rrdtool.sh" \
                >"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
-"$SERIAL_DEVICE" &
+"$SERIAL_DEVICE" \
+   >"@localstatedir@/log/radiator.log" 2>&1 &
 
 echo $! >"@localstatedir@/run/radiator.pid"
