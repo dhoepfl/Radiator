@@ -1,0 +1,38 @@
+#!  /bin/bash
+
+TIMESTAMP=""
+while read X; do
+   if [[ "$X" =~ ^\[TIME\]\ [A-Za-z]*,\ ([-0-9]*),\ ([:0-9]*) ]] ; then
+      TIMESTAMP="${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"
+   fi
+
+   if [ -n "$TIMESTAMP" ] ; then
+      if [[ "$X" =~ ^\[VALUE\]\ 0*([0-9a-f]+)\ \[([^]]*)\]\ =\ \[([^]]*)\]\ \[(.)\] ]] ; then
+         KEY="${BASH_REMATCH[1]}"
+         NAME="${BASH_REMATCH[2]}"
+         VALUE="${BASH_REMATCH[3]}"
+         TYPE="${BASH_REMATCH[4]}"
+
+         PRINTVALUES[$KEY]="$VALUE"
+         RAWVALUES[$KEY]="$X"
+
+         if [ "$TYPE" = "N" ] ; then
+            VALUES[$KEY]="${VALUE//[^-0-9.]*/}"
+         else
+            VALUES[$KEY]="'$VALUE'"
+         fi
+      fi
+
+      if [[ "$X" =~ ^$ ]] ; then
+         echo -n "INSERT INTO Measurement VALUES(NULL, '$TIMESTAMP'"
+         for i in {0..29}; do
+            echo -n ", ${VALUES[$i]}"
+         done
+         echo ");"
+
+         unset VALUES
+         unset PRINTVALUES
+         unset RAWVALUES
+      fi
+   fi
+done

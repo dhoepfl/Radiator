@@ -1,0 +1,26 @@
+#############################################################
+# Settings used by radiator_daemon.sh                       #
+#############################################################
+
+# The device name of the serial device.
+SERIAL_DEVICE="/dev/ttyAMA0"
+
+
+#############################################################
+# Settings used by radiator_mailError.sh                    #
+#############################################################
+
+# The email address used as sender of the error messages.
+MAIL_FROM='<heizung@example.com>'
+
+# The email address used as recipient of the error messages.
+MAIL_TO='<janitor@example.com>'
+
+
+#############################################################
+# Settings used by radiator_rrd.sh                          #
+#############################################################
+
+# The round robin database file
+RRD='/tmp/database.rrd'
+

@@ -1,16 +1,21 @@
 SUBDIRS = src
 
-nobase_release_bin__FILES = release/bin/radiator_analyseStream.sh \
-		release/bin/radiator_daemon.sh
+nobase_release_bin__FILES = release/bin/radiator_mailError.sh \
+                            release/bin/radiator_rrdtool.sh \
+                            release/bin/radiator_sql.sh \
+                            release/bin/radiator_daemon.sh
 nobase_release_init_d__FILES = release/etc/init.d/radiator.sh
-nobase_release_scripts__FILES = release/scripts/radiator_setup.sh
-CLEANFILES=$(nobase_release_bin__FILES) $(nobase_release_init_d__FILES) $(nobase_release_scripts__FILES)
-EXTRA_DIST = release.in
+nobase_release_scripts__FILES = release/scripts/radiator_setup_sql.sh \
+                                release/scripts/radiator_setup_rrd.sh
+nobase_release_share_doc_examples__FILES = release/etc/radiator.conf
+CLEANFILES=$(nobase_release_bin__FILES) $(nobase_release_init_d__FILES) $(nobase_release_scripts__FILES) $(nobase_release_share_doc_examples__FILES)
+EXTRA_DIST = release
 
 do_subst = sed \
 	-e 's|[@]prefix@|$(prefix)|g' \
 	-e 's|[@]bindir@|$(bindir)|g' \
 	-e 's|[@]sysconfdir@|$(sysconfdir)|g' \
+	-e 's|[@]docdir@|$(docdir)|g' \
 	-e 's|[@]localstatedir@|$(localstatedir)|g'
 
 release/%: release/%.in
@@ -30,6 +35,10 @@ install-data-hook-release-scripts: $(nobase_release_scripts__FILES)
 	mkdir -p "$(prefix)/scripts"
 	cp -- $(nobase_release_scripts__FILES) "$(prefix)/scripts"
 
-install-data-hook: install-data-hook-release-bin install-data-hook-release-init-d install-data-hook-release-scripts
+install-data-hook-release-share-doc-examples: $(nobase_release_share_doc_examples__FILES)
+	mkdir -p "$(docdir)/examples"
+	cp -- $(nobase_release_share_doc_examples__FILES) "$(docdir)/examples"
+
+install-data-hook: install-data-hook-release-bin install-data-hook-release-init-d install-data-hook-release-scripts install-data-hook-release-share-doc-examples
 	mkdir -p "$(localstatedir)/log"
 	mkdir -p "$(localstatedir)/run"
