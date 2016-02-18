@@ -1,8 +1,8 @@
 SUBDIRS = src
 
-nobase_release_bin__FILES = release/bin/radiator_mailError.sh \
-                            release/bin/radiator_rrdtool.sh \
-                            release/bin/radiator_sql.sh \
+nobase_release_bin__FILES = release/bin/radiator_mail.py \
+                            release/bin/radiator_rrdtool.py \
+                            release/bin/radiator_sql.py \
                             release/bin/radiator_daemon.sh
 nobase_release_init_d__FILES = release/etc/init.d/radiator.sh
 nobase_release_scripts__FILES = release/scripts/radiator_setup_sql.sh \

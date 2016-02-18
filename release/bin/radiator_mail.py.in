@@ -1,0 +1,152 @@
+#!  /usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import sys
+import re
+from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+from email import Charset
+
+Charset.add_charset('utf-8', Charset.QP, Charset.QP, 'utf-8')
+
+if len(sys.argv) != 3:
+   sys.stderr.write(sys.argv[0] + " <mail sender> <mail recipient>")
+   sys.stderr.write("\n")
+   sys.exit(1)
+
+MAIL_FROM=sys.argv[1]
+MAIL_TO=sys.argv[1]
+
+timestampRE = re.compile(r"^\[TIME\] [A-Za-z]*, ([-0-9]*), ([:0-9]*)")
+errorRE = re.compile(r"^\[ERROR\] (..., ....-..-.., ..:..:..): (.*)")
+valueCleanupRE = re.compile(r"[^-0-9.]*")
+valueRE = re.compile(r"^\[VALUE\] 0*([0-9]+) \[([^]]*)\] = \[([^]]*)] \[(.)\] \(([-0-9]*)\)")
+
+def mail_dump_lines(lines):
+   value_match = valueRE.match(lines[0])
+   display_1 = value_match.group(3) if value_match else ""
+   value_match = valueRE.match(lines[1])
+   display_2 = value_match.group(3) if value_match else ""
+   dump = ""
+   dump += "\n             .-----------------,"
+   dump += "\n             | %15s |" % (display_1)
+   dump += "\n             | %15s |" % (display_2)
+   dump += "\n             `-----------------'"
+   dump += "\n"
+   dump += "\nAktuelle Messwerte:"
+   dump += "\n"
+   for (key, line) in sorted(lines.items()):
+      if key > 1:
+         value_match = valueRE.match(line)
+         if value_match:
+            label = value_match.group(2)
+            value = value_match.group(3)
+
+            dump += "\n%25s    %s" % (label, value)
+
+   return dump
+
+def send_error_mail(error_time, error_description, lines):
+   linedump = mail_dump_lines(lines)
+   text = "Hallo," + \
+          "\n" + \
+          u"\nDie Heizung hat eine Störung gemeldet!" + \
+          "\n" + \
+          "\n   Uhrzeit: " + error_time + \
+          "\n   Meldung: " + error_description + \
+          "\n" + linedump + \
+          "\n" + \
+          "\n"
+
+   msg = MIMEText(text, 'plain', 'UTF-8')
+   msg['Subject'] = Header(u"Heizung: Störung", 'UTF-8')
+   msg['From'] = MAIL_FROM
+   msg['To'] = MAIL_TO
+
+   s = smtplib.SMTP('localhost')
+   s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
+   s.quit()
+
+def send_off_mail(lines, off_duration):
+   linedump = mail_dump_lines(lines)
+   off_hours = int(off_duration / 3600)
+   text = "Hallo," + \
+          "\n" + \
+          "\nDie Heizung ist seit mehr als %d Stunde(n) ausgeschaltet!" % (off_hours) + \
+          "\n" + \
+          "\n" + linedump + \
+          "\n" + \
+          "\n"
+
+   msg = MIMEText(text, 'plain', 'UTF-8')
+   msg['Subject'] = "Heizung: Ausgeschaltet"
+   msg['From'] = MAIL_FROM
+   msg['To'] = MAIL_TO
+
+   s = smtplib.SMTP('localhost')
+   s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
+   s.quit()
+
+timestamp = None
+values = {}
+rawvalues = {}
+value_lines = {}
+last_value_lines = {}
+
+turned_off = None
+off_mail_send_distance = 3600
+while True:
+   line = sys.stdin.readline()
+   if not line: break # EOF
+   line = line.decode('utf-8')
+
+   timestamp_match = timestampRE.match(line)
+   if timestamp_match:
+      timestamp=timestamp_match.group(1) + " " + timestamp_match.group(2)
+
+   error_match = errorRE.match(line)
+   if error_match:
+      send_error_mail(error_match.group(1), error_match.group(2), last_value_lines)
+
+   if timestamp:
+      value_match=valueRE.match(line)
+      if value_match:
+         key=int(value_match.group(1))
+         name=value_match.group(2)
+         value=value_match.group(3)
+         typ=value_match.group(4)
+         rawvalue=value_match.group(5)
+
+         value_lines[key] = line
+         rawvalues[key] = rawvalue
+         if typ == "N":
+            values[key] = valueCleanupRE.sub("", value)
+         else:
+            values[key] = "'" + value + "'"
+
+      if len(line) == 1:
+         # Check for radiator being turned off.
+         if int(rawvalues[0]) == 6:
+            # Radiator is off.
+
+            if not turned_off:
+               turned_off = datetime.now()
+               off_mail_send_distance = 3600
+            else:
+               # Off for 2 or more seconds
+               off_duration=(datetime.now() - turned_off).total_seconds()
+               if off_duration > off_mail_send_distance:
+                  send_off_mail(last_value_lines, off_mail_send_distance)
+                  off_mail_send_distance *= 2
+         else:
+            # Radiator is on
+            turned_off = None
+
+         values.clear()
+         rawvalues.clear()
+         last_value_lines = value_lines
+         value_lines = {}
+

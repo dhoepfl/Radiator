@@ -1,5 +1,5 @@
 #############################################################
-# Settings used by radiator_daemon.sh                       #
+# Settings used by radiator_daemon.py                       #
 #############################################################
 
 # The device name of the serial device.
@@ -7,7 +7,7 @@ SERIAL_DEVICE="/dev/ttyAMA0"
 
 
 #############################################################
-# Settings used by radiator_mailError.sh                    #
+# Settings used by radiator_mail.py                         #
 #############################################################
 
 # The email address used as sender of the error messages.
@@ -18,7 +18,7 @@ MAIL_TO='<janitor@example.com>'
 
 
 #############################################################
-# Settings used by radiator_rrd.sh                          #
+# Settings used by radiator_rrd.py                          #
 #############################################################
 
 # The round robin database file

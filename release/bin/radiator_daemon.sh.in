@@ -5,7 +5,7 @@ SCRIPT_HOME="$(dirname "$0")"
 [ -e "@sysconfdir@/radiator.conf" ] && source "@sysconfdir@/radiator.conf"
 [ -e "$HOME/.radiatorrc" ] && source "$HOME/.radiatorrc"
 
-if [ -z "$SERIAL_DEVICE" ] ; then
+if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" -o -z "$RRD" ] ; then
    exec >&2
    echo "\$HOME/.radiatorrc,"
    echo "@sysconfdir@/radiator.conf,"
@@ -13,7 +13,10 @@ if [ -z "$SERIAL_DEVICE" ] ; then
    echo
    echo "must set"
    echo
-   echo "   SERIAL_DEVICE"
+   echo "   MAIL_FROM,"
+   echo "   MAIL_TO,"
+   echo "   SERIAL_DEVICE, and"
+   echo "   RRD"
    echo
    echo "See @docdir@/radiator.conf for an example."
    echo
@@ -21,13 +24,13 @@ if [ -z "$SERIAL_DEVICE" ] ; then
 fi
 
 "@bindir@/radiator" \
--o >(tee -a >("@bindir@/radiator_sql.sh" | mysql \
-              >"@localstatedir@/log/radiator_sql.log" 2>&1) | \
-     tee -a >("@bindir@/radiator_mailError.sh" \
-              >"@localstatedir@/log/radiator_mailError.log" 2>&1) | \
-     "@bindir@/radiator_rrdtool.sh" \
-               >"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
-"$SERIAL_DEVICE" \
-   >"@localstatedir@/log/radiator.log" 2>&1 &
+      -o >(tee -a >("@bindir@/radiator_sql.py" | mysql \
+                    >"@localstatedir@/log/radiator_sql.log" 2>&1) | \
+           tee -a >("@bindir@/radiator_mail.py" "$MAIL_FROM" "$MAIL_TO" \
+                    >"@localstatedir@/log/radiator_mail" 2>&1) | \
+           "@bindir@/radiator_rrdtool.py" "$RRD" \
+           >"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
+      "$SERIAL_DEVICE" \
+      >"@localstatedir@/log/radiator.log" 2>&1 &
 
 echo $! >"@localstatedir@/run/radiator.pid"
