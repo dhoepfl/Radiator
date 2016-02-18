@@ -1,4 +1,5 @@
 #!  /usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 import sys
 import re
@@ -30,10 +31,10 @@ while True:
          if typ == "N":
             values[key] = valueCleanupRE.sub("", value)
          else:
-            values[key] = "'" + value + "'"
+            values[key] = u"'%s'" % (value)
          
       if len(line) == 1:
-         print("INSERT INTO Measurement VALUES(NULL, '" + timestamp + "', " +
-               ", ".join("%s" % (value) for (key, value) in sorted(values.items()))
-               + ");")
+         print(("INSERT INTO Measurement VALUES(NULL, '" + timestamp + "', " +
+               ", ".join("%s" % (value) for (key, value) in sorted(values.items())) + 
+               ");").encode('utf-8'))
 

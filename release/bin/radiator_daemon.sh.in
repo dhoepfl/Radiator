@@ -25,12 +25,12 @@ fi
 
 "@bindir@/radiator" \
       -o >(tee -a >("@bindir@/radiator_sql.py" | mysql \
-                    >"@localstatedir@/log/radiator_sql.log" 2>&1) | \
+                    >>"@localstatedir@/log/radiator_sql.log" 2>&1) | \
            tee -a >("@bindir@/radiator_mail.py" "$MAIL_FROM" "$MAIL_TO" \
-                    >"@localstatedir@/log/radiator_mail" 2>&1) | \
+                    >>"@localstatedir@/log/radiator_mail.log" 2>&1) | \
            "@bindir@/radiator_rrdtool.py" "$RRD" \
-           >"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
+           >>"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
       "$SERIAL_DEVICE" \
-      >"@localstatedir@/log/radiator.log" 2>&1 &
+      >>"@localstatedir@/log/radiator.log" 2>&1 &
 
 echo $! >"@localstatedir@/run/radiator.pid"
