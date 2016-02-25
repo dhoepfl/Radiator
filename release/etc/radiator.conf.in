@@ -10,6 +10,9 @@ SERIAL_DEVICE="/dev/ttyAMA0"
 # Settings used by radiator_mail.py                         #
 #############################################################
 
+# The mail server to use to send the mails.
+MAIL_SERVER='localhost'
+
 # The email address used as sender of the error messages.
 MAIL_FROM='<heizung@example.com>'
 

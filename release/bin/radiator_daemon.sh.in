@@ -5,7 +5,7 @@ SCRIPT_HOME="$(dirname "$0")"
 [ -e "@sysconfdir@/radiator.conf" ] && source "@sysconfdir@/radiator.conf"
 [ -e "$HOME/.radiatorrc" ] && source "$HOME/.radiatorrc"
 
-if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" -o -z "$RRD" ] ; then
+if [ -z "$MAIL_SERVER" -o -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" -o -z "$RRD" ] ; then
    exec >&2
    echo "\$HOME/.radiatorrc,"
    echo "@sysconfdir@/radiator.conf,"
@@ -13,6 +13,7 @@ if [ -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE" -o -z "$RRD" ] ; th
    echo
    echo "must set"
    echo
+   echo "   MAIL_SERVER,"
    echo "   MAIL_FROM,"
    echo "   MAIL_TO,"
    echo "   SERIAL_DEVICE, and"
@@ -26,7 +27,7 @@ fi
 "@bindir@/radiator" \
       -o >(tee -a >("@bindir@/radiator_sql.py" | mysql \
                     >>"@localstatedir@/log/radiator_sql.log" 2>&1) | \
-           tee -a >("@bindir@/radiator_mail.py" "$MAIL_FROM" "$MAIL_TO" \
+           tee -a >("@bindir@/radiator_mail.py" "$MAIL_SERVER" "$MAIL_FROM" "$MAIL_TO" \
                     >>"@localstatedir@/log/radiator_mail.log" 2>&1) | \
            "@bindir@/radiator_rrdtool.py" "$RRD" \
            >>"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
