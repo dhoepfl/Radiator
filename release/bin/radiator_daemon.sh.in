@@ -24,8 +24,12 @@ if [ -z "$MAIL_SERVER" -o -z "$MAIL_FROM" -o -z "$MAIL_TO" -o -z "$SERIAL_DEVICE
    exit 1
 fi
 
+if [ -z "$SQL_BINARY" ] ; then
+   SQL_BINARY="mysql"
+fi
+
 "@bindir@/radiator" \
-      -o >(tee -a >("@bindir@/radiator_sql.py" | mysql \
+      -o >(tee -a >("@bindir@/radiator_sql.py" | "$SQL_BINARY" \
                     >>"@localstatedir@/log/radiator_sql.log" 2>&1) | \
            tee -a >("@bindir@/radiator_mail.py" "$MAIL_SERVER" "$MAIL_FROM" "$MAIL_TO" \
                     >>"@localstatedir@/log/radiator_mail.log" 2>&1) | \

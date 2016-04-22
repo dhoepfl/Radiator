@@ -7,6 +7,14 @@ SERIAL_DEVICE="/dev/ttyAMA0"
 
 
 #############################################################
+# Settings used by radiator_sql.py                          #
+#############################################################
+
+# The executable to send the SQL statements to.
+SQL_BINARY='mysql'
+
+
+#############################################################
 # Settings used by radiator_mail.py                         #
 #############################################################
 
