@@ -4,11 +4,13 @@
 import os
 import sys
 import re
+import time
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 from email import Charset
+from email import utils
 
 Charset.add_charset('utf-8', Charset.QP, Charset.QP, 'utf-8')
 
@@ -69,6 +71,7 @@ def send_error_mail(error_time, error_description, lines):
    msg['Subject'] = Header(u"Heizung: Störung", 'UTF-8')
    msg['From'] = MAIL_FROM
    msg['To'] = MAIL_TO
+   msg['Date'] = utils.formatdate(time.mktime(datetime.now().timetuple()))
 
    s = smtplib.SMTP(MAIL_SERVER)
    s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
@@ -89,6 +92,7 @@ def send_off_mail(lines, off_duration):
    msg['Subject'] = "Heizung: Ausgeschaltet"
    msg['From'] = MAIL_FROM
    msg['To'] = MAIL_TO
+   msg['Date'] = utils.formatdate(time.mktime(datetime.now().timetuple()))
 
    s = smtplib.SMTP(MAIL_SERVER)
    s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
