@@ -15,6 +15,16 @@ SQL_BINARY='mysql'
 
 
 #############################################################
+# Settings used by radiator_vu.py                           #
+#############################################################
+
+# The VU server (host:port) to use to send the messages.
+# Use '-' to disable.
+# VU_SERVER='vu.example.com:80'
+VU_SERVER='-'
+
+
+#############################################################
 # Settings used by radiator_mail.py                         #
 #############################################################
 
