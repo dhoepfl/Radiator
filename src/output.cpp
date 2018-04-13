@@ -84,7 +84,6 @@ void OutputHandler::handleMeasurement(Surveillance &surveillance,
 }
 
 void OutputHandler::handleError(Surveillance &surveillance,
-                                uint8_t dow,
                                 uint16_t year, uint8_t month, uint8_t day,
                                 uint8_t hour, uint8_t minute, uint8_t second,
                                 std::string description)
@@ -93,10 +92,7 @@ void OutputHandler::handleError(Surveillance &surveillance,
       return;
    }
 
-   static const char *dowString[7] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-
    *ostream << "[ERROR] "
-      << dowString[dow-1] << ", "
       << std::dec
       << std::setw(4) << std::setfill('0') << (int) year << "-"
       << std::setw(2) << std::setfill('0') << (int) month << "-"

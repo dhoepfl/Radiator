@@ -318,7 +318,7 @@ void Surveillance::parseFailure(const uint8_t *command)
    uint8_t day = this->bcd(command[9]);
    uint8_t month = this->bcd(command[10]);
    uint16_t year = 2000+this->bcd(command[12]);
-   uint8_t dow = command[11];
+   // uint8_t unknown3 = command[11];
 
    auto errorText = this->errorMessages.find(errorID);
    std::string description;
@@ -339,7 +339,6 @@ void Surveillance::parseFailure(const uint8_t *command)
       << description << std::endl;
 
    this->handler.handleError(*this,
-                             dow,
                              year, month, day,
                              hour, minute, second,
                              description);
@@ -477,7 +476,7 @@ void Surveillance::parseLastError(const uint8_t *command)
    event.day = this->bcd(command[9]);
    event.month = this->bcd(command[10]);
    event.year = this->bcd(command[12]);
-   event.dow = command[11];
+   event.unknown3 = command[11];
 
    this->errorEvents.push_back(event);
 }

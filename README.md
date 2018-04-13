@@ -369,7 +369,7 @@ Enthält Beschreibungen für mögliche Fehler im Fehlerprotokoll „MU“.
 | 1      | 0x..           | Stunden                                                             |
 | 1      | 0x..           | Tag                                                                 |
 | 1      | 0x..           | Monat                                                               |
-| 1      | 0x..           | Wochentag (1: Montag, ..., 7: Sonntag)                              |
+| 1      | 0x..           | Unbekannt                                                           |
 | 1      | 0x..           | Jahr                                                                |
 | 2      | 0x.. 0x..      | Prüfsumme                                                           |
 

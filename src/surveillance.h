@@ -62,7 +62,7 @@ typedef struct
    uint8_t day;
    uint8_t month;
    uint8_t year;
-   uint8_t dow;
+   uint8_t unknown3;
 } ERROR_EVENT;
 
 typedef struct
@@ -89,7 +89,6 @@ public:
                                   std::list<VALUE_DATA> values) {}
 
    virtual void handleError(Surveillance &surveillance,
-                            uint8_t dow,
                             uint16_t year, uint8_t month, uint8_t day,
                             uint8_t hour, uint8_t minute, uint8_t second,
                             std::string description) {}
