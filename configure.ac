@@ -1,4 +1,4 @@
-AC_INIT([radiator], [0.3.0])
+AC_INIT([Radiator], [0.3.1], [daniel@hoepfl.de], [radiator])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AM_INIT_AUTOMAKE
 

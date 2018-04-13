@@ -10,8 +10,15 @@
 #include <iostream>
 #include <iomanip>
 
+#if HAVE_CONFIG_H  
+#include "config.h"
+#endif 
+
+
 void usage(std::ostream &ostream, std::string argv0)
 {
+   ostream << PACKAGE_NAME << " V" << PACKAGE_VERSION << std::endl;
+   ostream << std::endl;
    ostream << "Usage: " << argv0 << " [-h] [-D[level]] [-T <timeout in s>] [-o <output>] <serial port name>" << std::endl;
    ostream << std::endl;
    ostream << "   -h                 Print this usage info and exit." << std::endl;
@@ -34,6 +41,8 @@ void usage(std::ostream &ostream, std::string argv0)
    ostream << "                      \"-\" writes to stdout." << std::endl;
    ostream << std::endl;
    ostream << "   <serial port>      Filename of the serial device." << std::endl;
+   ostream << std::endl;
+   ostream << "Report bugs to " << PACKAGE_BUGREPORT << std::endl;
    ostream << std::endl;
 }
 
