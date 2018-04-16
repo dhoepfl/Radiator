@@ -15,12 +15,18 @@
 #endif 
 
 
-void usage(std::ostream &ostream, std::string argv0)
+void versionInfo(std::ostream &ostream)
 {
    ostream << PACKAGE_NAME << " V" << PACKAGE_VERSION << std::endl;
+   ostream << "Report bugs to " << PACKAGE_BUGREPORT << std::endl;
    ostream << std::endl;
-   ostream << "Usage: " << argv0 << " [-h] [-D[level]] [-T <timeout in s>] [-o <output>] <serial port name>" << std::endl;
+}
+
+void usage(std::ostream &ostream, std::string argv0)
+{
+   ostream << "Usage: " << argv0 << " [-V] [-h] [-D[level]] [-T <timeout in s>] [-o <output>] <serial port name>" << std::endl;
    ostream << std::endl;
+   ostream << "   -V                 Print version info and exit." << std::endl;
    ostream << "   -h                 Print this usage info and exit." << std::endl;
    ostream << std::endl;
    ostream << "   -D[level]          Increase log level or set to the given level." << std::endl;
@@ -42,8 +48,8 @@ void usage(std::ostream &ostream, std::string argv0)
    ostream << std::endl;
    ostream << "   <serial port>      Filename of the serial device." << std::endl;
    ostream << std::endl;
-   ostream << "Report bugs to " << PACKAGE_BUGREPORT << std::endl;
-   ostream << std::endl;
+
+   versionInfo(ostream);
 }
 
 int main(int argc, char *argv[])
@@ -53,7 +59,7 @@ int main(int argc, char *argv[])
    int timeout = 1500;
 
    std::string output = "";
-   for (int c = 0; (c = ::getopt(argc, argv, "+D::T:o:h")) != -1;) {
+   for (int c = 0; (c = ::getopt(argc, argv, "+D::T:o:hV")) != -1;) {
       switch (c) {
          case 'D':
             if (optarg) {
@@ -83,6 +89,9 @@ int main(int argc, char *argv[])
             ::exit(1);
          case 'h':
             usage(std::cerr, argv[0]);
+            ::exit(1);
+         case 'V':
+            versionInfo(std::cerr);
             ::exit(1);
       }
    }
