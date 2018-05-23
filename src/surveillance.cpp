@@ -337,6 +337,7 @@ void Surveillance::parseFailure(const uint8_t *command)
       << std::setw(2) << std::setfill('0') << (int) minute << ":"
       << std::setw(2) << std::setfill('0') << (int) second << ": "
       << description << std::endl;
+   dump_string("# ", command, command[2]+5, LOG_error);
 
    this->handler.handleError(*this,
                              year, month, day,
