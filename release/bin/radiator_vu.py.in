@@ -56,11 +56,12 @@ def send_off_message(off_duration):
    try:
       query = urllib.urlencode({ "text": text.encode('utf-8'), "type": "3", "timeout": "" })
       contents = urllib2.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
-      sys.stdout.write("Sent message to VU @{0}: \n".format(VU_SERVER))
+      now = utils.formatdate(time.mktime(datetime.now().timetuple()))
+      sys.stdout.write("Sent message to VU @{0} ({1}): \n".format(VU_SERVER, now))
       sys.stdout.write(contents)
       sys.stdout.flush()
    except:
-      sys.stdout.write("Sent message to VU @{0}: FAILED\n".format(VU_SERVER))
+      sys.stdout.write("Sent message to VU @{0} ({1}): FAILED\n".format(VU_SERVER, now))
       sys.stdout.flush()
 
 timestamp = None
