@@ -10,22 +10,52 @@ import urllib2
 from email import utils
 from datetime import datetime
 
-if len(sys.argv) != 3:
-   sys.stderr.write(sys.argv[0] + " <pushed app key> <pushed app secret>")
-   sys.stderr.write("Use '-' as app key or app secret to disable the script.")
+if len(sys.argv) != 2:
+   sys.stderr.write(sys.argv[0] + " <channel alias>")
+   sys.stderr.write("Set the channel alias to '-' to use default channel\n")
+   sys.stderr.write("The following env variables are required:\n")
+   sys.stderr.write(" APP_KEY    The app key\n")
+   sys.stderr.write(" APP_SECRET The app secret\n")
    sys.stderr.write("\n")
    sys.exit(1)
 
-APP_KEY=sys.argv[1]
-APP_SECRET=sys.argv[2]
+APP_KEY=os.getenv("APP_KEY")
+APP_SECRET=os.getenv("APP_SECRET")
 
-if len(APP_KEY) == 0 or APP_KEY == "-" or len(APP_SECRET) == 0 or APP_SECRET == "-":
-   sys.stdout.write("pushed app key or app secret set to '-', disabled.\n")
+enabled = True
+enabled = enabled and APP_KEY is not None
+enabled = enabled and APP_SECRET is not None
+enabled = enabled and len(APP_KEY) > 0 and APP_KEY != "-"
+enabled = enabled and len(APP_SECRET) > 0 and APP_SECRET != "-"
+
+if not enabled:
+   sys.stdout.write("APP_KEY or APP_SECRET environment unset or '-', disabled.\n")
    sys.stdout.flush()
    while True:
       line = sys.stdin.readline()
       if not line: break # EOF
    sys.exit(0)
+
+PUSHED_CHANNEL=sys.argv[1]
+if len(PUSHED_CHANNEL) == 0 or PUSHED_CHANNEL == "-":
+   sys.stdout.write("Using default channel\n")
+   sys.stdout.flush()
+   message_content = {
+         "app_key" : APP_KEY,
+         "app_secret" : APP_SECRET,
+         "target_type" : "app",
+         "content" : ""
+      }
+else:
+   sys.stdout.write("Using channel {0}\n".format(PUSHED_CHANNEL))
+   sys.stdout.flush()
+   message_content = {
+         "app_key" : APP_KEY,
+         "app_secret" : APP_SECRET,
+         "target_type" : "channel",
+         "target_alias" : PUSHED_CHANNEL,
+         "content" : ""
+      }
 
 timestampRE = re.compile(r"^\[TIME\] [A-Za-z]*, ([-0-9]*), ([:0-9]*)")
 errorRE = re.compile(r"^\[ERROR\] (..., ....-..-.., ..:..:..): (.*)")
@@ -40,12 +70,8 @@ def send_error_message(error_time, error_description):
    now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
       url = "https://api.pushed.co/1/push"
-      data = urllib.urlencode({
-         "app_key" : APP_KEY,
-         "app_secret" : APP_SECRET,
-         "target_type" : "app",
-         "content" : text.encode('utf-8')
-      })
+      message_content["content"] = text.encode('utf-8')
+      data = urllib.urlencode(message_content)
       req = urllib2.Request(url, data)
       response = urllib2.urlopen(req)
       contents = response.read()
@@ -63,12 +89,8 @@ def send_off_message(off_duration):
    now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
       url = "https://api.pushed.co/1/push"
-      data = urllib.urlencode({
-         "app_key" : APP_KEY,
-         "app_secret" : APP_SECRET,
-         "target_type" : "app",
-         "content" : text.encode('utf-8')
-      })
+      message_content["content"] = text.encode('utf-8')
+      data = urllib.urlencode(message_content)
       req = urllib2.Request(url, data)
       response = urllib2.urlopen(req)
       contents = response.read()

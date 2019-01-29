@@ -43,12 +43,16 @@ MAIL_TO='<janitor@example.com>'
 #############################################################
 
 # The APP key used at pushed.co
-# Use '-' to disable pushed sending.
+# Use '-' or empty to disable pushed sending.
 PUSHED_APP_KEY='-'
 
 # The app SECRET used at pushed.co
-# Use '-' to disable pushed sending.
+# Use '-' or empty to disable pushed sending.
 PUSHED_APP_SECRET='-'
+
+# The target channel alias to use
+# Use '-' or empty to push to default channel
+PUSHED_CHANNEL='-'
 
 
 #############################################################

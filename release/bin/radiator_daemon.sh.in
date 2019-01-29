@@ -33,7 +33,8 @@ fi
                     >>"@localstatedir@/log/radiator_sql.log" 2>&1) | \
            tee -a >("@bindir@/radiator_vu.py" "$VU_SERVER" \
                     >>"@localstatedir@/log/radiator_vu.log" 2>&1) | \
-           tee -a >("@bindir@/radiator_pushed.py" "$PUSHED_APP_KEY" "$PUSHED_APP_SECRET" \
+           tee -a >(APP_KEY="$PUSHED_APP_KEY" APP_SECRET=""$PUSHED_APP_SECRET" \
+                     "@bindir@/radiator_pushed.py" "$PUSHED_CHANNEL" \
                     >>"@localstatedir@/log/radiator_pushed.log" 2>&1) | \
            tee -a >("@bindir@/radiator_mail.py" "$MAIL_SERVER" "$MAIL_FROM" "$MAIL_TO" \
                     >>"@localstatedir@/log/radiator_mail.log" 2>&1) | \
