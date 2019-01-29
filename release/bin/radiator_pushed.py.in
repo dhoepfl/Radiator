@@ -7,6 +7,7 @@ import re
 import time
 import urllib
 import urllib2
+from email import utils
 from datetime import datetime
 
 if len(sys.argv) != 3:
@@ -36,44 +37,46 @@ def send_error_message(error_time, error_description):
           error_time +  ": " + \
           error_description + ")"
 
+   now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
       url = "https://api.pushed.co/1/push"
       data = urllib.urlencode({
          "app_key" : APP_KEY,
          "app_secret" : APP_SECRET,
          "target_type" : "app",
-         "content" : text
+         "content" : text.encode('utf-8')
       })
       req = urllib2.Request(url, data)
       response = urllib2.urlopen(req)
       contents = response.read()
-      sys.stdout.write("Sent message to pushed server:\n")
-      sys.stdout.write(contents)
+      sys.stdout.write("{0}: Sent message to pushed server:\n".format(now))
+      sys.stdout.write("{0}\n".format(contents))
       sys.stdout.flush()
-   except:
-      sys.stdout.write("Sent message to pushed server: FAILED\n")
+   except Exception as error:
+      sys.stdout.write("{0}: Send message to pushed server: FAILED ({1})\n".format(now, error))
       sys.stdout.flush()
 
 def send_off_message(off_duration):
    off_hours = int(off_duration / 3600)
    text = "Die Heizung ist seit mehr als %d Stunde(n) ausgeschaltet!\n" % (off_hours)
 
+   now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
       url = "https://api.pushed.co/1/push"
       data = urllib.urlencode({
          "app_key" : APP_KEY,
          "app_secret" : APP_SECRET,
          "target_type" : "app",
-         "content" : text
+         "content" : text.encode('utf-8')
       })
       req = urllib2.Request(url, data)
       response = urllib2.urlopen(req)
       contents = response.read()
-      sys.stdout.write("Sent message to pushed server:\n")
-      sys.stdout.write(contents)
+      sys.stdout.write("{0}: Sent message to pushed server:\n".format(now))
+      sys.stdout.write("{0}\n".format(contents))
       sys.stdout.flush()
-   except:
-      sys.stdout.write("Sent message to pushed server: FAILED\n")
+   except Exception as error:
+      sys.stdout.write("{0}: Send message to pushed server: FAILED ({1})\n".format(now, error))
       sys.stdout.flush()
 
 timestamp = None

@@ -37,14 +37,15 @@ def send_error_message(error_time, error_description):
           "\n   Uhrzeit: " + error_time + \
           "\n   Meldung: " + error_description
 
+   now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
       query = urllib.urlencode({ "text": text.encode('utf-8'), "type": "3", "timeout": "" })
       contents = urllib2.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
-      sys.stdout.write("Sent message to VU @{0}: \n".format(VU_SERVER))
+      sys.stdout.write("{0}: Sent message to VU @{1}: \n".format(now, VU_SERVER))
       sys.stdout.write(contents)
       sys.stdout.flush()
-   except:
-      sys.stdout.write("Sent message to VU @{0}: FAILED\n".format(VU_SERVER))
+   except Exception as error:
+      sys.stdout.write("{0}: Sent message to VU @{1}: FAILED ({2})\n".format(now, VU_SERVER, error))
       sys.stdout.flush()
 
 def send_off_message(off_duration):
@@ -53,15 +54,15 @@ def send_off_message(off_duration):
            "\n" + \
            "\nUhrzeit: " + utils.formatdate(time.mktime(datetime.now().timetuple()))
 
+   now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
       query = urllib.urlencode({ "text": text.encode('utf-8'), "type": "3", "timeout": "" })
       contents = urllib2.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
-      now = utils.formatdate(time.mktime(datetime.now().timetuple()))
-      sys.stdout.write("Sent message to VU @{0} ({1}): \n".format(VU_SERVER, now))
+      sys.stdout.write("{0}: Sent message to VU @{1}: \n".format(now, VU_SERVER))
       sys.stdout.write(contents)
       sys.stdout.flush()
-   except:
-      sys.stdout.write("Sent message to VU @{0} ({1}): FAILED\n".format(VU_SERVER, now))
+   except Exception as error:
+      sys.stdout.write("{0}: Sent message to VU @{1}: FAILED ({2})\n".format(now, VU_SERVER, error))
       sys.stdout.flush()
 
 timestamp = None
