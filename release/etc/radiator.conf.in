@@ -39,6 +39,19 @@ MAIL_TO='<janitor@example.com>'
 
 
 #############################################################
+# Settings used by radiator_pushed.py                       #
+#############################################################
+
+# The APP key used at pushed.co
+# Use '-' to disable pushed sending.
+PUSHED_APP_KEY='-'
+
+# The app SECRET used at pushed.co
+# Use '-' to disable pushed sending.
+PUSHED_APP_SECRET='-'
+
+
+#############################################################
 # Settings used by radiator_rrd.py                          #
 #############################################################
 

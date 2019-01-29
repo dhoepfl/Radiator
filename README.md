@@ -389,39 +389,3 @@ Beendet die Übertragung eines der obigen Daten-Blöcke.
 | 2      | 0x.. 0x..      | Prüfsumme                                                           |
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
