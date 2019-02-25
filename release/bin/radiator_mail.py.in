@@ -24,7 +24,7 @@ MAIL_FROM=sys.argv[2]
 MAIL_TO=sys.argv[3]
 
 timestampRE = re.compile(r"^\[TIME\] [A-Za-z]*, ([-0-9]*), ([:0-9]*)")
-errorRE = re.compile(r"^\[ERROR\] (..., ....-..-.., ..:..:..): (.*)")
+errorRE = re.compile(r"^\[ERROR\] (....-..-.., ..:..:..): (.*)")
 valueCleanupRE = re.compile(r"[^-0-9.]*")
 valueRE = re.compile(r"^\[VALUE\] 0*([0-9]+) \[([^]]*)\] = \[([^]]*)] \[(.)\] \(([-0-9]*)\)")
 
