@@ -6,7 +6,7 @@ Fast alle Geräte in unserem Haushalt haben einen eingebauten Signalgeber, um un
 
 Mein erster Ansatz war, eine kleine Überwachung zu bauen, die die Farbe der LED erkennt und darauf basierend einen Alarm auslöst. Ich bin Softwerker, kein Hardware-Profi. An der Erkennung der Farbe (zu kleinem Preis) bin ich gescheitert. Noch während ich daran gearbeitet habe, bin ich darauf gestoßen, dass die P2 bzw. die darin verbaute Lambdatronic S 3100 eine serielle Schnittstelle hat, über die sie praktisch voll bedienbar ist. Da ich zunächst eine Lösung wollte, für die ich mich nicht direkt mit der Heizung verbinden muss (Gewährleistung, Diskussionen mit dem Service, ...), habe ich diese Möglichkeit zunächst nicht weiter verfolgt.
 
-Nachdem wir in den letzten Wochen mehrmals (Pellets-Lager wird leer) mehrmals durch kaltes Wasser auf die Farbe der LED hingewiesen wurden, habe ich das Projekt wiederbelebt. Dieses Mal ist mir der Mitarbeiter der Wartungsfirma egal.
+Nachdem wir in den letzten Wochen mehrmals (Pellets-Lager wird leer) durch kaltes Wasser auf die Farbe der LED hingewiesen wurden, habe ich das Projekt wiederbelebt. Dieses Mal ist mir der Mitarbeiter der Wartungsfirma egal.
 
 ## Protokollanalyse
 
