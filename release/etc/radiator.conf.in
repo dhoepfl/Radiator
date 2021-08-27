@@ -1,5 +1,5 @@
 #############################################################
-# Settings used by radiator_daemon.py                       #
+# Settings used by radiatord.sh                             #
 #############################################################
 
 # The device name of the serial device.

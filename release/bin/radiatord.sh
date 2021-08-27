@@ -28,7 +28,8 @@ if [ -z "$SQL_BINARY" ] ; then
    SQL_BINARY="mysql"
 fi
 
-"@bindir@/radiator" \
+(
+   "@bindir@/radiator" \
       -o >(tee -a >("@bindir@/radiator_sql.py" | "$SQL_BINARY" \
                     >>"@localstatedir@/log/radiator_sql.log" 2>&1) | \
            tee -a >("@bindir@/radiator_vu.py" "$VU_SERVER" \
@@ -42,5 +43,10 @@ fi
            >>"@localstatedir@/log/radiator_rrdtool.log" 2>&1) \
       "$SERIAL_DEVICE" \
       >>"@localstatedir@/log/radiator.log" 2>&1 &
+   TO_KILL=$!
+   trap "kill $TO_KILL" EXIT
+   wait $TO_KILL
+   trap - EXIT
+) &
 
 echo $! >"@localstatedir@/run/radiator.pid"

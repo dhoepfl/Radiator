@@ -288,7 +288,7 @@ nobase_release_bin__FILES = release/bin/radiator_mail.py \
                             release/bin/radiator_pushed.py \
                             release/bin/radiator_rrdtool.py \
                             release/bin/radiator_sql.py \
-                            release/bin/radiator_daemon.sh
+                            release/bin/radiatord.sh
 
 nobase_release_init_d__FILES = release/etc/init.d/radiator.sh
 nobase_release_scripts__FILES = release/scripts/radiator_setup_sql.sh \
