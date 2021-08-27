@@ -1,12 +1,11 @@
-#!  /usr/bin/env python2
+#!  /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
 import sys
 import re
 import time
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
 from email import utils
 from datetime import datetime
 
@@ -63,7 +62,7 @@ valueCleanupRE = re.compile(r"[^-0-9.]*")
 valueRE = re.compile(r"^\[VALUE\] 0*([0-9]+) \[([^]]*)\] = \[([^]]*)] \[(.)\] \(([-0-9]*)\)")
 
 def send_error_message(error_time, error_description):
-   text = u"Die Heizung hat eine Störung gemeldet! (" + \
+   text = "Die Heizung hat eine Störung gemeldet! (" + \
           error_time +  ": " + \
           error_description + ")"
 
@@ -71,9 +70,9 @@ def send_error_message(error_time, error_description):
    try:
       url = "https://api.pushed.co/1/push"
       message_content["content"] = text.encode('utf-8')
-      data = urllib.urlencode(message_content)
-      req = urllib2.Request(url, data)
-      response = urllib2.urlopen(req)
+      data = urllib.parse.urlencode(message_content).encode('utf-8')
+      req = urllib.request.Request(url, data)
+      response = urllib.request.urlopen(req)
       contents = response.read()
       sys.stdout.write("{0}: Sent message to pushed server:\n".format(now))
       sys.stdout.write("{0}\n".format(contents))
@@ -90,9 +89,9 @@ def send_off_message(off_duration):
    try:
       url = "https://api.pushed.co/1/push"
       message_content["content"] = text.encode('utf-8')
-      data = urllib.urlencode(message_content)
-      req = urllib2.Request(url, data)
-      response = urllib2.urlopen(req)
+      data = urllib.parse.urlencode(message_content).encode('utf-8')
+      req = urllib.request.Request(url, data)
+      response = urllib.request.urlopen(req)
       contents = response.read()
       sys.stdout.write("{0}: Sent message to pushed server:\n".format(now))
       sys.stdout.write("{0}\n".format(contents))
@@ -109,14 +108,6 @@ off_send_distance = 3600
 while True:
    line = sys.stdin.readline()
    if not line: break # EOF
-   try:
-      line = line.decode('utf-8')
-   except:
-      sys.stdout.write("Failed to UTF-8-decode line <")
-      sys.stdout.write(line)
-      sys.stdout.write(">\n")
-      sys.stdout.flush()
-      line = ""
 
    timestamp_match = timestampRE.match(line)
    if timestamp_match:

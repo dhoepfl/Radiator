@@ -1,4 +1,4 @@
-#!  /usr/bin/env python2
+#!  /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import sys
@@ -14,14 +14,6 @@ values = {}
 while True:
    line = sys.stdin.readline()
    if not line: break # EOF
-   try:
-      line = line.decode('utf-8')
-   except:
-      sys.stdout.write("Failed to UTF-8-decode line <")
-      sys.stdout.write(line)
-      sys.stdout.write(">\n")
-      sys.stdout.flush()
-      line = ""
 
    timestamp_match = timestampRE.match(line)
    if timestamp_match:
@@ -38,10 +30,10 @@ while True:
          if typ == "N":
             values[key] = valueCleanupRE.sub("", value)
          else:
-            values[key] = u"'%s'" % (value)
+            values[key] = "'%s'" % (value)
          
       if len(line) == 1:
-         print(("INSERT INTO Measurement VALUES(NULL, '" + timestamp + "', " +
+         print("INSERT INTO Measurement VALUES(NULL, '" + timestamp + "', " +
                ", ".join("%s" % (value) for (key, value) in sorted(values.items())) + 
-               ");").encode('utf-8'))
+               ");")
 

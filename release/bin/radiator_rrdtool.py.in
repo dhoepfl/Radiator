@@ -1,4 +1,4 @@
-#!  /usr/bin/env python2
+#!  /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
@@ -23,14 +23,6 @@ values = {}
 while True:
    line = sys.stdin.readline()
    if not line: break # EOF
-   try:
-      line = line.decode('utf-8')
-   except:
-      sys.stdout.write("Failed to UTF-8-decode line <")
-      sys.stdout.write(line)
-      sys.stdout.write(">\n")
-      sys.stdout.flush()
-      line = ""
 
    timestamp_match = timestampRE.match(line)
    if timestamp_match:
@@ -57,11 +49,11 @@ while True:
                                     "update",
                                     RRD,
                                     DS])
-         except OSError, e:
+         except OSError as e:
             sys.stderr.write("Failed to call rrdtool: " + e.strerror + "\n")
             pass
-         except subprocess.CalledProcessError, e:
-            sys.stderr.write("Failed to call rrdtool: " + e.output + "\n")
+         except subprocess.CalledProcessError as e:
+            sys.stderr.write("Failed to call rrdtool: " + e.output.decode('utf-8') + "\n")
             pass
 
          values.clear()

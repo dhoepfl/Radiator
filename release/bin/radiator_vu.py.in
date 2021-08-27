@@ -1,12 +1,11 @@
-#!  /usr/bin/env python2
+#!  /usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 import os
 import sys
 import re
 import time
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
 from email import utils
 from datetime import datetime
 
@@ -32,17 +31,17 @@ valueCleanupRE = re.compile(r"[^-0-9.]*")
 valueRE = re.compile(r"^\[VALUE\] 0*([0-9]+) \[([^]]*)\] = \[([^]]*)] \[(.)\] \(([-0-9]*)\)")
 
 def send_error_message(error_time, error_description):
-   text = u"Die Heizung hat eine Störung gemeldet!" + \
+   text = "Die Heizung hat eine Störung gemeldet!" + \
           "\n" + \
           "\n   Uhrzeit: " + error_time + \
           "\n   Meldung: " + error_description
 
    now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
-      query = urllib.urlencode({ "text": text.encode('utf-8'), "type": "3", "timeout": "" })
-      contents = urllib2.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
+      query = urllib.parse.urlencode({ "text": text, "type": "3", "timeout": "" })
+      contents = urllib.request.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
       sys.stdout.write("{0}: Sent message to VU @{1}: \n".format(now, VU_SERVER))
-      sys.stdout.write(contents)
+      sys.stdout.write(contents.decode('utf-8'))
       sys.stdout.flush()
    except Exception as error:
       sys.stdout.write("{0}: Sent message to VU @{1}: FAILED ({2})\n".format(now, VU_SERVER, error))
@@ -56,10 +55,10 @@ def send_off_message(off_duration):
 
    now = utils.formatdate(time.mktime(datetime.now().timetuple()))
    try:
-      query = urllib.urlencode({ "text": text.encode('utf-8'), "type": "3", "timeout": "" })
-      contents = urllib2.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
+      query = urllib.parse.urlencode({ "text": text, "type": "3", "timeout": "" })
+      contents = urllib.request.urlopen("http://{0}/web/message?{1}".format(VU_SERVER, query)).read()
       sys.stdout.write("{0}: Sent message to VU @{1}: \n".format(now, VU_SERVER))
-      sys.stdout.write(contents)
+      sys.stdout.write(contents.decode('utf-8'))
       sys.stdout.flush()
    except Exception as error:
       sys.stdout.write("{0}: Sent message to VU @{1}: FAILED ({2})\n".format(now, VU_SERVER, error))
@@ -73,14 +72,6 @@ off_send_distance = 3600
 while True:
    line = sys.stdin.readline()
    if not line: break # EOF
-   try:
-      line = line.decode('utf-8')
-   except:
-      sys.stdout.write("Failed to UTF-8-decode line <")
-      sys.stdout.write(line)
-      sys.stdout.write(">\n")
-      sys.stdout.flush()
-      line = ""
 
    timestamp_match = timestampRE.match(line)
    if timestamp_match:
