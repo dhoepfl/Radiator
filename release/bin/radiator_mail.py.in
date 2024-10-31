@@ -3,6 +3,7 @@
 
 import os
 import sys
+import traceback
 import re
 import time
 from datetime import datetime
@@ -73,9 +74,12 @@ def send_error_mail(error_time, error_description, lines):
    msg['To'] = MAIL_TO
    msg['Date'] = utils.formatdate(time.mktime(datetime.now().timetuple()))
 
-   s = smtplib.SMTP(MAIL_SERVER)
-   s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
-   s.quit()
+   try:
+      s = smtplib.SMTP(MAIL_SERVER)
+      s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
+      s.quit()
+   except:
+      traceback.print_exc()
 
 def send_off_mail(lines, off_duration):
    linedump = mail_dump_lines(lines)
@@ -94,9 +98,12 @@ def send_off_mail(lines, off_duration):
    msg['To'] = MAIL_TO
    msg['Date'] = utils.formatdate(time.mktime(datetime.now().timetuple()))
 
-   s = smtplib.SMTP(MAIL_SERVER)
-   s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
-   s.quit()
+   try:
+      s = smtplib.SMTP(MAIL_SERVER)
+      s.sendmail(MAIL_FROM, [MAIL_TO], msg.as_string())
+      s.quit()
+   except:
+      traceback.print_exc()
 
 timestamp = None
 values = {}
