@@ -1,3 +1,22 @@
+[V0.4.x - 2025-02]
+
+* Added Alertzy as notification service
+
+[V0.3.x - 2024-10]
+
+* Protocol fixes
+* Added versionand contact info in help output
+* Added command line option to show version number.
+* UTF-8 related bug fixes
+* Improved log messages
+* Added pushed.co as notification service
+
+[V0.2.0 - 2027-10]
+
+* Configurable mysql binary
+* Improved mail notification
+* Added notification to VU/OpenWebIF
+
 [2016-02]
 
 Initial release
