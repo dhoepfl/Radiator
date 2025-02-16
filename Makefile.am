@@ -3,6 +3,7 @@ SUBDIRS = src
 nobase_release_bin__FILES = release/bin/radiator_mail.py \
                             release/bin/radiator_vu.py \
                             release/bin/radiator_pushed.py \
+                            release/bin/radiator_alertzy.py \
                             release/bin/radiator_rrdtool.py \
                             release/bin/radiator_sql.py \
                             release/bin/radiatord.sh

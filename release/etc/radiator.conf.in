@@ -56,6 +56,19 @@ PUSHED_CHANNEL='-'
 
 
 #############################################################
+# Settings used by radiator_alertzy.py                      #
+#############################################################
+
+# The account key provided by Alertzy.
+# Use '-' or empty to disable pushed sending.
+ALERTZY_ACCOUNT_KEY='-'
+
+# The notification group to use (also used as notification title)
+# Use '-' or empty to push to default group 'Radiator'.
+ALERTZY_GROUP='-'
+
+
+#############################################################
 # Settings used by radiator_rrd.py                          #
 #############################################################
 

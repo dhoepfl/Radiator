@@ -37,6 +37,9 @@ fi
            tee -a >(APP_KEY="$PUSHED_APP_KEY" APP_SECRET="$PUSHED_APP_SECRET" \
                      "@bindir@/radiator_pushed.py" "$PUSHED_CHANNEL" \
                     >>"@localstatedir@/log/radiator_pushed.log" 2>&1) | \
+           tee -a >(ACCOUNT_KEY="$ALERTZY_ACCOUNT_KEY" \
+                     "@bindir@/radiator_alertzy.py" "$ALERTZY_GROUP" \
+                    >>"@localstatedir@/log/radiator_alertzy.log" 2>&1) | \
            tee -a >("@bindir@/radiator_mail.py" "$MAIL_SERVER" "$MAIL_FROM" "$MAIL_TO" \
                     >>"@localstatedir@/log/radiator_mail.log" 2>&1) | \
            "@bindir@/radiator_rrdtool.py" "$RRD" \
